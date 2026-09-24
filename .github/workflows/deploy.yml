@@ -13,7 +13,6 @@ permissions:
   id-token: write
 
 # Allow one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow deployments to complete.
 concurrency:
   group: 'pages'
   cancel-in-progress: false
@@ -35,11 +34,25 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
       - name: Build application
         run: npm run build
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
+      - name: Verify production build output
+        run: |
+          if [ ! -f "dist/index.html" ]; then
+            echo "ERROR: dist/index.html was not generated!"
+            exit 1
+          fi
+          if grep -q "src/main.jsx" dist/index.html; then
+            echo "ERROR: dist/index.html references src/main.jsx instead of production assets!"
+            exit 1
+          fi
+          echo "Verified: dist/index.html exists and references production assets."
+          ls -la dist/
+          ls -la dist/assets/
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
