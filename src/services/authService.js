@@ -1,95 +1,60 @@
 // =============================================================================
 // WORKSPACE OS — Authentication Service
-// Multi-user authentication layer with Google Sign-In session handling
+// Bridges Firebase Auth with Workspace OS user storage partitions
 // =============================================================================
 
-const SESSION_KEY = 'workspace_os_active_session';
-const USERS_INDEX_KEY = 'workspace_os_registered_users';
-
-// Helper to simulate asynchronous network latency for backend readiness
-const delay = (ms = 40) => new Promise((resolve) => setTimeout(resolve, ms));
+import {
+  signInWithGoogle,
+  signInWithGithub,
+  signOutUser,
+  deleteActiveUser,
+  onAuthStateChange
+} from './firebase';
 
 export const authService = {
   /**
-   * Retrieves the currently authenticated session or null.
+   * Listen to Firebase auth state changes.
    */
-  async getCurrentUser() {
-    await delay();
-    try {
-      const stored = localStorage.getItem(SESSION_KEY);
-      return stored ? JSON.parse(stored) : null;
-    } catch {
-      return null;
-    }
+  subscribeToAuth(callback) {
+    return onAuthStateChange(callback);
   },
 
   /**
-   * Google Sign-In handler.
-   * Can accept user profile credentials or initialize a clean Google account.
+   * Google Sign-In via Firebase
    */
-  async signInWithGoogle(customProfile = null) {
-    await delay(120);
-
-    const userProfile = customProfile || {
-      id: `usr_${Date.now()}`,
-      name: 'Workspace User',
-      email: 'user@workspaceos.app',
-      avatar: null,
-      provider: 'google',
-      createdAt: new Date().toISOString()
-    };
-
-    try {
-      // Store session
-      localStorage.setItem(SESSION_KEY, JSON.stringify(userProfile));
-
-      // Register into local users registry
-      const rawUsers = localStorage.getItem(USERS_INDEX_KEY);
-      const users = rawUsers ? JSON.parse(rawUsers) : [];
-      if (!users.some((u) => u.id === userProfile.id)) {
-        users.push(userProfile);
-        localStorage.setItem(USERS_INDEX_KEY, JSON.stringify(users));
-      }
-
-      return userProfile;
-    } catch (err) {
-      console.error('Failed to persist authentication session', err);
-      throw new Error('Authentication failed. Please try again.');
-    }
+  async signInWithGoogle() {
+    return await signInWithGoogle();
   },
 
   /**
-   * Clears the active session and logs out to public landing page.
+   * GitHub Sign-In via Firebase
+   */
+  async signInWithGithub() {
+    return await signInWithGithub();
+  },
+
+  /**
+   * Sign Out via Firebase
    */
   async signOut() {
-    await delay(50);
-    try {
-      localStorage.removeItem(SESSION_KEY);
-      return true;
-    } catch {
-      return false;
-    }
+    await signOutUser();
+    return true;
   },
 
   /**
-   * Deletes all local records associated with the active user account.
+   * Deletes all local records associated with the user account and deletes Firebase user
    */
   async deleteAccount(userId) {
-    await delay(150);
-    if (!userId) return false;
-    try {
-      // Clear all scoped keys for this user
+    if (userId) {
       const prefix = `ws_data_${userId}_`;
       Object.keys(localStorage).forEach((key) => {
         if (key.startsWith(prefix)) {
           localStorage.removeItem(key);
         }
       });
-      localStorage.removeItem(SESSION_KEY);
-      return true;
-    } catch {
-      return false;
     }
+    await deleteActiveUser();
+    return true;
   }
 };
 

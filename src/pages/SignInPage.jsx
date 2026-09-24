@@ -1,38 +1,47 @@
 // =============================================================================
 // WORKSPACE OS — Sign In Page
-// Matches Top-Right Panel of Product Preview
+// Matches Top-Right Panel of Product Preview (Real Firebase Auth)
 // =============================================================================
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Shield, LayoutDashboard, ArrowLeft } from 'lucide-react';
+import { Shield, LayoutDashboard, ArrowLeft, AlertCircle } from 'lucide-react';
 import Logo from '../components/Logo';
 import Butterfly from '../components/Butterfly';
 import GoogleIcon from '../components/GoogleIcon';
+import GithubIcon from '../components/GithubIcon';
 import { useAuth } from '../context/AuthContext';
 
 export default function SignInPage() {
   const navigate = useNavigate();
-  const { loginWithGoogle, loading } = useAuth();
-  const [customName, setCustomName] = useState('');
-  const [customEmail, setCustomEmail] = useState('');
-  const [showCustomOption, setShowCustomOption] = useState(false);
+  const { loginWithGoogle, loginWithGithub, isAuthenticated, loading } = useAuth();
+  const [authError, setAuthError] = useState(null);
 
-  const handleSignIn = async (e) => {
-    if (e) e.preventDefault();
-    let profile = null;
-    if (customEmail.trim()) {
-      profile = {
-        id: `usr_${customEmail.replace(/[^a-zA-Z0-9]/g, '_')}`,
-        name: customName.trim() || customEmail.split('@')[0],
-        email: customEmail.trim(),
-        avatar: null,
-        provider: 'google',
-        createdAt: new Date().toISOString()
-      };
+  // If already authenticated, immediately proceed to workspace
+  useEffect(() => {
+    if (isAuthenticated && !loading) {
+      navigate('/workspace/dashboard', { replace: true });
     }
-    await loginWithGoogle(profile);
-    navigate('/workspace/dashboard');
+  }, [isAuthenticated, loading, navigate]);
+
+  const handleGoogleSignIn = async () => {
+    setAuthError(null);
+    try {
+      await loginWithGoogle();
+      navigate('/workspace/dashboard');
+    } catch (err) {
+      setAuthError(err.message || 'Google authentication failed. Please try again.');
+    }
+  };
+
+  const handleGithubSignIn = async () => {
+    setAuthError(null);
+    try {
+      await loginWithGithub();
+      navigate('/workspace/dashboard');
+    } catch (err) {
+      setAuthError(err.message || 'GitHub authentication failed. Please try again.');
+    }
   };
 
   return (
@@ -119,60 +128,58 @@ export default function SignInPage() {
             </h2>
 
             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: 28 }}>
-              Continue with your Google account to get started.
+              Choose your preferred sign-in provider to continue.
             </p>
 
-            {/* Google Sign-In Action */}
-            <button
-              type="button"
-              className="ws-btn-google"
-              style={{ width: '100%' }}
-              onClick={() => handleSignIn()}
-              disabled={loading}
-            >
-              <GoogleIcon size={18} />
-              <span>Continue with Google</span>
-            </button>
+            {/* Error Message Notice */}
+            {authError && (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 10,
+                  background: 'rgba(239, 68, 68, 0.12)',
+                  border: '1px solid rgba(239, 68, 68, 0.35)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: '12px 14px',
+                  color: '#FCA5A5',
+                  fontSize: '0.78rem',
+                  lineHeight: 1.45,
+                  marginBottom: 20,
+                  textAlign: 'left'
+                }}
+              >
+                <AlertCircle size={16} style={{ flexShrink: 0, marginTop: 2 }} />
+                <span>{authError}</span>
+              </div>
+            )}
 
-            {/* Custom Google Account Simulator for testing multi-user isolation */}
-            <div style={{ marginTop: 14 }}>
+            {/* Authentication Buttons */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {/* Google Sign-In */}
               <button
                 type="button"
-                className="ws-btn-ghost"
-                style={{ fontSize: '0.7rem', color: 'var(--text-faint)', textDecoration: 'underline' }}
-                onClick={() => setShowCustomOption(!showCustomOption)}
+                className="ws-btn-google"
+                style={{ width: '100%' }}
+                onClick={handleGoogleSignIn}
+                disabled={loading}
               >
-                {showCustomOption ? 'Hide test account options' : 'Specify test Google account email'}
+                <GoogleIcon size={18} />
+                <span>Continue with Google</span>
+              </button>
+
+              {/* GitHub Sign-In */}
+              <button
+                type="button"
+                className="ws-btn-github"
+                style={{ width: '100%' }}
+                onClick={handleGithubSignIn}
+                disabled={loading}
+              >
+                <GithubIcon size={18} />
+                <span>Continue with GitHub</span>
               </button>
             </div>
-
-            {showCustomOption && (
-              <form onSubmit={handleSignIn} style={{ marginTop: 16, textAlign: 'left' }}>
-                <div className="ws-field" style={{ marginBottom: 10 }}>
-                  <label className="ws-field-label">Account Name</label>
-                  <input
-                    type="text"
-                    className="ws-input"
-                    placeholder="e.g. Alex Morgan"
-                    value={customName}
-                    onChange={(e) => setCustomName(e.target.value)}
-                  />
-                </div>
-                <div className="ws-field" style={{ marginBottom: 14 }}>
-                  <label className="ws-field-label">Google Email</label>
-                  <input
-                    type="email"
-                    className="ws-input"
-                    placeholder="alex@gmail.com"
-                    value={customEmail}
-                    onChange={(e) => setCustomEmail(e.target.value)}
-                  />
-                </div>
-                <button type="submit" className="ws-btn ws-btn-primary ws-btn-sm" style={{ width: '100%' }}>
-                  Sign in with this account
-                </button>
-              </form>
-            )}
 
             <p
               style={{
@@ -204,7 +211,7 @@ export default function SignInPage() {
                   Secure
                 </div>
                 <div style={{ fontSize: '0.64rem', color: 'var(--text-faint)' }}>
-                  Your data is private
+                  Firebase OAuth 2.0
                 </div>
               </div>
             </div>

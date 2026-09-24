@@ -3,6 +3,7 @@
 // Matches Top-Left Panel of Product Preview
 // =============================================================================
 
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   FolderKanban,
@@ -15,23 +16,45 @@ import {
   Shield,
   Check,
   ArrowRight,
-  Sparkles
+  Sparkles,
+  AlertCircle
 } from 'lucide-react';
 import Logo from '../components/Logo';
 import Butterfly from '../components/Butterfly';
 import GoogleIcon from '../components/GoogleIcon';
+import GithubIcon from '../components/GithubIcon';
 import { useAuth } from '../context/AuthContext';
 
 export default function LandingPage() {
   const navigate = useNavigate();
-  const { isAuthenticated, loginWithGoogle } = useAuth();
+  const { isAuthenticated, loginWithGoogle, loginWithGithub, loading } = useAuth();
+  const [authError, setAuthError] = useState(null);
 
   const handleGoogleCTA = async () => {
-    if (isAuthenticated) {
-      navigate('/workspace/dashboard');
-    } else {
-      await loginWithGoogle();
-      navigate('/workspace/dashboard');
+    setAuthError(null);
+    try {
+      if (isAuthenticated) {
+        navigate('/workspace/dashboard');
+      } else {
+        await loginWithGoogle();
+        navigate('/workspace/dashboard');
+      }
+    } catch (err) {
+      setAuthError(err.message || 'Google sign-in failed. Please try again.');
+    }
+  };
+
+  const handleGithubCTA = async () => {
+    setAuthError(null);
+    try {
+      if (isAuthenticated) {
+        navigate('/workspace/dashboard');
+      } else {
+        await loginWithGithub();
+        navigate('/workspace/dashboard');
+      }
+    } catch (err) {
+      setAuthError(err.message || 'GitHub sign-in failed. Please try again.');
     }
   };
 
@@ -103,15 +126,50 @@ export default function LandingPage() {
 
         {/* Primary Call to Action */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
-          <button
-            type="button"
-            className="ws-btn-google"
-            onClick={handleGoogleCTA}
-            aria-label="Continue with Google"
-          >
-            <GoogleIcon size={20} />
-            <span>Continue with Google</span>
-          </button>
+          {authError && (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                background: 'rgba(239, 68, 68, 0.12)',
+                border: '1px solid rgba(239, 68, 68, 0.35)',
+                borderRadius: 'var(--radius-md)',
+                padding: '10px 18px',
+                color: '#FCA5A5',
+                fontSize: '0.8rem',
+                maxWidth: 480,
+                textAlign: 'left'
+              }}
+            >
+              <AlertCircle size={16} style={{ flexShrink: 0 }} />
+              <span>{authError}</span>
+            </div>
+          )}
+
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
+            <button
+              type="button"
+              className="ws-btn-google"
+              onClick={handleGoogleCTA}
+              aria-label="Continue with Google"
+              disabled={loading}
+            >
+              <GoogleIcon size={20} />
+              <span>Continue with Google</span>
+            </button>
+
+            <button
+              type="button"
+              className="ws-btn-github"
+              onClick={handleGithubCTA}
+              aria-label="Continue with GitHub"
+              disabled={loading}
+            >
+              <GithubIcon size={20} />
+              <span>Continue with GitHub</span>
+            </button>
+          </div>
 
           {/* Value Props Checkmarks */}
           <div className="landing-checkmarks">
@@ -121,7 +179,7 @@ export default function LandingPage() {
             </span>
             <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <Check size={14} color="var(--status-green)" />
-              Secure Google Sign-In
+              Secure Google & GitHub Sign-In
             </span>
             <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <Check size={14} color="var(--status-green)" />
@@ -249,14 +307,26 @@ export default function LandingPage() {
           <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', lineHeight: 1.6, marginBottom: 32 }}>
             WORKSPACE OS is built with strict multi-user tenant isolation. Your records, notes, files, and applications are never shared, never exposed to other accounts, and never used to train public models.
           </p>
-          <button
-            type="button"
-            className="ws-btn-google"
-            onClick={handleGoogleCTA}
-          >
-            <GoogleIcon size={18} />
-            <span>Get Your Private Workspace</span>
-          </button>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
+            <button
+              type="button"
+              className="ws-btn-google"
+              onClick={handleGoogleCTA}
+              disabled={loading}
+            >
+              <GoogleIcon size={18} />
+              <span>Continue with Google</span>
+            </button>
+            <button
+              type="button"
+              className="ws-btn-github"
+              onClick={handleGithubCTA}
+              disabled={loading}
+            >
+              <GithubIcon size={18} />
+              <span>Continue with GitHub</span>
+            </button>
+          </div>
         </div>
       </section>
 

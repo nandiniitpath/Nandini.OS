@@ -22,6 +22,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { initials } from '../utils/helpers';
 import GoogleIcon from '../components/GoogleIcon';
+import GithubIcon from '../components/GithubIcon';
 import { loadUserRecords } from '../services/storageHelper';
 
 const RESOURCES = [
@@ -183,8 +184,8 @@ export default function Settings() {
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span className="ws-badge violet" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <GoogleIcon size={13} />
-                <span>Google Account</span>
+                {user?.provider === 'github' ? <GithubIcon size={13} /> : <GoogleIcon size={13} />}
+                <span>{user?.provider === 'github' ? 'GitHub Account' : 'Google Account'}</span>
               </span>
             </div>
           </div>
@@ -434,7 +435,7 @@ export default function Settings() {
                 Authentication Provider
               </div>
               <div style={{ fontSize: '0.74rem', color: 'var(--text-faint)' }}>
-                OAuth 2.0 Google Identity Services protocol
+                Firebase Authentication ({user?.provider === 'github' ? 'GitHub OAuth' : 'Google Identity'})
               </div>
             </div>
             <span className="ws-badge blue">

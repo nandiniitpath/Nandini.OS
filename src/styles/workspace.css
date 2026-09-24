@@ -484,6 +484,38 @@
   box-shadow: 0 12px 40px rgba(139, 92, 246, 0.35);
 }
 
+/* GitHub Sign In Button */
+.ws-btn-github {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background-color: #161B22;
+  color: #F0F6FC;
+  font-weight: 600;
+  font-size: 0.88rem;
+  padding: 12px 24px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  transition: all var(--trans-base);
+}
+
+.ws-btn-github:hover {
+  background-color: #21262D;
+  border-color: rgba(139, 92, 246, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(139, 92, 246, 0.25);
+}
+
+.ws-btn-google:disabled,
+.ws-btn-github:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
 /* ── Cards & Panels ──────────────────────────────────────────────── */
 .ws-card {
   background: var(--bg-card);
