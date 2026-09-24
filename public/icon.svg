@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
+  <defs>
+    <linearGradient id="cubeTop" x1="20" y1="4" x2="20" y2="18" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#A78BFA" />
+      <stop offset="100%" stop-color="#8B5CF6" />
+    </linearGradient>
+    <linearGradient id="cubeLeft" x1="6" y1="13" x2="20" y2="35" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#7C3AED" />
+      <stop offset="100%" stop-color="#4C1D95" />
+    </linearGradient>
+    <linearGradient id="cubeRight" x1="20" y1="13" x2="34" y2="35" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#6366F1" />
+      <stop offset="100%" stop-color="#312E81" />
+    </linearGradient>
+  </defs>
+  <!-- Top Face -->
+  <polygon points="20,4 34,12 20,20 6,12" fill="url(#cubeTop)" />
+  <!-- Left Face -->
+  <polygon points="6,12 20,20 20,36 6,28" fill="url(#cubeLeft)" />
+  <!-- Right Face -->
+  <polygon points="20,20 34,12 34,28 20,36" fill="url(#cubeRight)" />
+  <!-- Inner Cutout/Glow lines -->
+  <polygon points="20,8 29,13 20,18 11,13" fill="#090B14" opacity="0.6" />
+  <polygon points="11,14.5 19,19 19,30 11,25.5" fill="#090B14" opacity="0.6" />
+  <polygon points="21,19 29,14.5 29,25.5 21,30" fill="#090B14" opacity="0.6" />
+</svg>

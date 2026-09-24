@@ -1,0 +1,10 @@
+# NANDINI.OS
+
+node_modules/
+dist/
+.env
+.env.local
+.env.production
+*.log
+.DS_Store
+Thumbs.db
