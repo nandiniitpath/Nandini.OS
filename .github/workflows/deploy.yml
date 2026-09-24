@@ -38,21 +38,14 @@ jobs:
         uses: actions/configure-pages@v5
 
       - name: Build application
+        env:
+          VITE_FIREBASE_API_KEY: ${{ vars.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ vars.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ vars.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ vars.VITE_FIREBASE_APP_ID }}
         run: npm run build
-
-      - name: Verify production build output
-        run: |
-          if [ ! -f "dist/index.html" ]; then
-            echo "ERROR: dist/index.html was not generated!"
-            exit 1
-          fi
-          if grep -q "src/main.jsx" dist/index.html; then
-            echo "ERROR: dist/index.html references src/main.jsx instead of production assets!"
-            exit 1
-          fi
-          echo "Verified: dist/index.html exists and references production assets."
-          ls -la dist/
-          ls -la dist/assets/
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

@@ -23,20 +23,31 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID || ''
 };
 
-// Initialize Firebase App instance safely (singleton pattern)
-const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+// Safe initialization of Firebase App instance (singleton pattern)
+let app = null;
+let auth = null;
+let googleProvider = null;
+let githubProvider = null;
 
-// Initialize Firebase Authentication instance
-export const auth = getAuth(app);
+try {
+  if (firebaseConfig.apiKey) {
+    app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+    auth = getAuth(app);
 
-// Configure Google Auth Provider (basic profile & email only, no Drive/Sheets scopes yet)
-export const googleProvider = new GoogleAuthProvider();
-googleProvider.setCustomParameters({ prompt: 'select_account' });
+    // Configure Google Auth Provider (basic profile & email only, no Drive/Sheets scopes yet)
+    googleProvider = new GoogleAuthProvider();
+    googleProvider.setCustomParameters({ prompt: 'select_account' });
 
-// Configure GitHub Auth Provider
-export const githubProvider = new GithubAuthProvider();
-githubProvider.addScope('read:user');
-githubProvider.addScope('user:email');
+    // Configure GitHub Auth Provider
+    githubProvider = new GithubAuthProvider();
+    githubProvider.addScope('read:user');
+    githubProvider.addScope('user:email');
+  }
+} catch (err) {
+  console.warn('Firebase initialization warning:', err);
+}
+
+export { auth, googleProvider, githubProvider };
 
 /**
  * Format Firebase user into the standardized Workspace OS profile schema.
@@ -80,7 +91,7 @@ export function parseAuthError(error) {
       return 'This authentication provider is not enabled in your Firebase Console.';
     case 'auth/invalid-api-key':
     case 'auth/api-key-not-valid':
-      return 'Invalid Firebase API Key. Please verify your VITE_FIREBASE_API_KEY in the .env file.';
+      return 'Invalid Firebase API Key. Please verify your VITE_FIREBASE_API_KEY environment variable.';
     case 'auth/network-request-failed':
       return 'Network connection error. Please check your internet connection.';
     case 'auth/requires-recent-login':
@@ -94,6 +105,9 @@ export function parseAuthError(error) {
  * Google Sign-In with popup
  */
 export async function signInWithGoogle() {
+  if (!auth || !googleProvider) {
+    throw new Error('Firebase Authentication is not initialized. Please ensure VITE_FIREBASE_API_KEY is configured.');
+  }
   try {
     const result = await signInWithPopup(auth, googleProvider);
     return formatUserProfile(result.user);
@@ -107,6 +121,9 @@ export async function signInWithGoogle() {
  * GitHub Sign-In with popup
  */
 export async function signInWithGithub() {
+  if (!auth || !githubProvider) {
+    throw new Error('Firebase Authentication is not initialized. Please ensure VITE_FIREBASE_API_KEY is configured.');
+  }
   try {
     const result = await signInWithPopup(auth, githubProvider);
     return formatUserProfile(result.user);
@@ -120,6 +137,7 @@ export async function signInWithGithub() {
  * Sign out of Firebase
  */
 export async function signOutUser() {
+  if (!auth) return;
   try {
     await fbSignOut(auth);
   } catch (err) {
@@ -132,7 +150,7 @@ export async function signOutUser() {
  * Delete the currently authenticated Firebase user
  */
 export async function deleteActiveUser() {
-  if (!auth.currentUser) return;
+  if (!auth || !auth.currentUser) return;
   try {
     await deleteUser(auth.currentUser);
   } catch (err) {
@@ -145,6 +163,10 @@ export async function deleteActiveUser() {
  * Subscribe to Firebase onAuthStateChanged
  */
 export function onAuthStateChange(callback) {
+  if (!auth) {
+    callback(null);
+    return () => {};
+  }
   return fbOnAuthStateChanged(auth, (firebaseUser) => {
     callback(formatUserProfile(firebaseUser));
   });
