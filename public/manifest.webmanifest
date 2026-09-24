@@ -1,0 +1,23 @@
+{
+  "name": "WORKSPACE OS — Personal Operating System",
+  "short_name": "WORKSPACE OS",
+  "start_url": "/WorkSpace.OS/",
+  "scope": "/WorkSpace.OS/",
+  "display": "standalone",
+  "theme_color": "#080914",
+  "background_color": "#080914",
+  "icons": [
+    {
+      "src": "/WorkSpace.OS/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/WorkSpace.OS/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
