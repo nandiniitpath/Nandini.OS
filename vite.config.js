@@ -22,5 +22,5 @@ export default defineConfig({
       }
     }
   ],
-  base: '/Nandini.OS/',
+  base: '/WorkSpace.OS/',
 });
