@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="34" height="34">
+  <defs>
+    <linearGradient id="msShieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0078D4"/>
+      <stop offset="100%" stop-color="#004E8C"/>
+    </linearGradient>
+    <linearGradient id="msShieldCheck" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#50E6FF"/>
+      <stop offset="100%" stop-color="#00A4EF"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#msShieldGrad)" d="M24 4L42 10.5v12.2c0 11.2-7.7 21.6-18 24.3C13.7 44.3 6 33.9 6 22.7V10.5L24 4z"/>
+  <path fill="url(#msShieldCheck)" opacity=".3" d="M24 8.2v34C31.5 39.8 38 31.7 38 22.7V13.3L24 8.2z"/>
+  <path fill="#fff" d="M20.5 28.5l-5-5-2 2 7 7 15-15-2-2z"/>
+</svg>
