@@ -7,7 +7,7 @@ import { ArrowUpRight } from 'lucide-react';
 import { toolIconMap } from '../utils/helpers';
 
 export default function ToolCard({ tool, onClick }) {
-  const iconEmoji = toolIconMap[tool.icon] || '🔧';
+  const iconSrc = tool.icon ? `${import.meta.env.BASE_URL}icons/${tool.icon}` : null;
 
   return (
     <div
@@ -35,12 +35,24 @@ export default function ToolCard({ tool, onClick }) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '1.25rem',
             flexShrink: 0
           }}
           aria-hidden="true"
         >
-          {iconEmoji}
+          {iconSrc ? (
+            <img
+              src={iconSrc}
+              alt={tool.name}
+              width={24}
+              height={24}
+              style={{ width: 24, height: 24, objectFit: 'contain' }}
+              loading="lazy"
+            />
+          ) : (
+            <span style={{ fontSize: '1rem', color: 'var(--accent-lavender)' }}>
+              {tool.name.slice(0, 2).toUpperCase()}
+            </span>
+          )}
         </div>
         <div style={{ overflow: 'hidden' }}>
           <h4

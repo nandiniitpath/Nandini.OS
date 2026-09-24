@@ -11,7 +11,7 @@ import { mockProjects } from '../data/mockData';
 export default function ToolDrawer({ tool, open, onClose }) {
   if (!tool) return null;
 
-  const iconEmoji = toolIconMap[tool.icon] || '🔧';
+  const iconSrc = tool.icon ? `${import.meta.env.BASE_URL}icons/${tool.icon}` : null;
   const relatedProjects = mockProjects.filter(p => tool.relatedProjects?.includes(p.id));
 
   return (
@@ -29,12 +29,24 @@ export default function ToolDrawer({ tool, open, onClose }) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '1.8rem',
               flexShrink: 0
             }}
             aria-hidden="true"
           >
-            {iconEmoji}
+            {iconSrc ? (
+              <img
+                src={iconSrc}
+                alt={tool.name}
+                width={32}
+                height={32}
+                style={{ width: 32, height: 32, objectFit: 'contain' }}
+                loading="lazy"
+              />
+            ) : (
+              <span style={{ fontSize: '1.2rem', color: 'var(--accent-lavender)' }}>
+                {tool.name.slice(0, 2).toUpperCase()}
+              </span>
+            )}
           </div>
           <div>
             <h3

@@ -57,3 +57,6 @@ export const datasetCategories = [
   { id: 'Datasets', label: 'Datasets' },
   { id: 'Reports', label: 'Reports' }
 ];
+
+export const mockProjects = [];
+
