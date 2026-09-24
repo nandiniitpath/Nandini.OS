@@ -29,7 +29,7 @@ import Settings from './pages/Settings';
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
         <Routes>
           {/* Public Landing Page */}
           <Route path="/" element={<LandingPage />} />
